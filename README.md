@@ -1,1 +1,11 @@
-# PortForward-Language
+# PortForward Language
+
+The portforward language is used to efficently run server side scripting with java. It also includes the ability to run javascript functions from the server or vise-versa. It includes a large library of things to do, but you can also use just the java library to run from the scripts. You can do a ton of stuff. As it uses java, you can have full control over the server computer, however is also from a safe standpoint. For the protection of the clients, you cannot run java on their computers, however you are able to run a javascript function using an AJAX library and a handler script that comes with the portforward server. PortForward is completely open source, as you see from the GitHub project, so feel free to make any changes you wish to the source as long as it follows the liscense.
+
+# PortForward Database
+
+The portforward database is a database which can be used by your scripts, and also some files are used by the server (aka. the banned users file). The database is written solely in JSON, instead of SQL, as JSON is more secure than SQL, and is able to run much faster, as it only requires one connection to a server.
+
+# PortForward Configurations
+
+All configurations for the PortForward server / api is written in JSON and is located in the database. There is multiple 
