@@ -6,7 +6,8 @@ public class Start {
       Server server = new Server(args[0], args[1], args[2]);
       while (true) {
         int response = server.waitAndRespondToClientRequest();
-        System.out.println()
+        Date date = new Date();
+        System.out.println("[" + date.toString() + "] STANDARD: HTTP response code " + response + " given to client request.");
       }
     } else {
       Date date = new Date();
