@@ -1,7 +1,11 @@
 package server;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
+
 public class Start {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     if (args.length == 4) {
       int port = Integer.parseInt(args[3]);
       Server server = new Server(args[0], args[1], args[2], port);
