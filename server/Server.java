@@ -1,21 +1,27 @@
 package server;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import document.Webpage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Date;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import con.google.gson.Json;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-import java.io.FileInputStream;
-import java.util.zip.ZipEntry;
-import java.util.jar.JarFile;
-import com.google.gson.JsonObject;
-import java.net.URLClassLoader;
-import java.lang.reflect.Method;
-import java.lang.Class;
 
 public class Server {
   File root;
@@ -23,19 +29,19 @@ public class Server {
   File database;
   ServerSocket s;
   
-  public Server(String rootDir, String scriptDir, String dataDir, int port) {
+  public Server(String rootDir, String scriptDir, String dataDir, int port) throws IOException {
     root = new File(rootDir);
     scripts = new File(scriptDir);
     database = new File(dataDir);
     s = new ServerSocket(port);
-    Data date = new Date();
+    Date date = new Date();
     System.out.println("[" + date.toString() + "] STANDARD: Server started on port " + port);
   }
   
-  public int waitAndRespondToClientRequest() {
+  public int waitAndRespondToClientRequest() throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     Socket c = s.accept();
     BufferedReader in = new BufferedReader(new InputStreamReader(c.getInputStream()));
-    PrintWriter out = new PrintWriter(c.getOutputStream, true);
+    PrintWriter out = new PrintWriter(c.getOutputStream(), true);
     // read data sent from client.
     String line;
     String[] brokenLine;
@@ -53,13 +59,13 @@ public class Server {
         // check if user is banned
         File bannedJson = new File(database.getPath() + "/banned.json");
         if (bannedJson.exists()) {
-          BufferedReader bannedReader = new BufferedReader(new FileInputStream(bannedJson));
+          BufferedReader bannedReader = new BufferedReader(new InputStreamReader(new FileInputStream(bannedJson)));
           String json = "";
           String lineA;
           while ((lineA = bannedReader.readLine()) != null) {
             json = json + lineA;
           }
-          Json jsonReader = new Json();
+          Gson jsonReader = new Gson();
           String[] ips = jsonReader.fromJson(json, String[].class);
           String ip = c.getInetAddress().toString();
           for (int x = ips.length; x > 0; x--) {
@@ -75,19 +81,22 @@ public class Server {
           ZipEntry entry = zip.getNextEntry();
           while (zip.getNextEntry() != null) {
             if (entry.getName().equals("info.json")) {
-              BufferedReader infoReader = new BufferedReader(pfar.getInputStream(entry));
+              BufferedReader infoReader = new BufferedReader(new InputStreamReader(pfar.getInputStream(entry)));
               String infoLine;
               String fullInfo = "";
               while ((infoLine = infoReader.readLine()) != null) {
                 fullInfo = fullInfo + infoLine;
               }
               JsonObject objInfo = jsonReader.fromJson(fullInfo, JsonObject.class);
-              String scriptName = jsonObject.get("script");
+              JsonElement scriptNameEle = objInfo.get("script");
+              String scriptName = scriptNameEle.getAsString();
               Webpage webpage = new Webpage(requestedFile);
               if (scriptName != null) {
-                String main = jsonObject.get("main");
+                JsonElement mainEle = objInfo.get("main");
+                String main = mainEle.getAsString();
+                File scriptFileFile = new File(scripts.getPath() + scriptName);
                 JarFile scriptFile = new JarFile(scripts.getPath() + scriptName);
-                URLClassLoader scriptLoader = new URLClassLoader(new URL[]{scriptFile.toURI().toURL()}, this.getClass().getClassLoader());
+                URLClassLoader scriptLoader = new URLClassLoader(new URL[]{scriptFileFile.toURI().toURL()}, this.getClass().getClassLoader());
                 Class classToLoad = Class.forName(main, true, scriptLoader);
                 Method method = classToLoad.getDeclaredMethod("onLoad");
                 Object[] args = {new Webpage[]{webpage}};
@@ -102,4 +111,6 @@ public class Server {
         }
       }
     }
+    return 400;
   }
+}
