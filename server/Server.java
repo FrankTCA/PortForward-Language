@@ -11,6 +11,11 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.io.FileInputStream;
 import java.util.zip.ZipEntry;
+import java.util.jar.JarFile;
+import com.google.gson.JsonObject;
+import java.net.URLClassLoader;
+import java.lang.reflect.Method;
+import java.lang.Class;
 
 public class Server {
   File root;
@@ -78,7 +83,23 @@ public class Server {
               }
               JsonObject objInfo = jsonReader.fromJson(fullInfo, JsonObject.class);
               String scriptName = jsonObject.get("script");
+              Webpage webpage = new Webpage(requestedFile);
               if (scriptName != null) {
                 String main = jsonObject.get("main");
                 JarFile scriptFile = new JarFile(scripts.getPath() + scriptName);
-                
+                URLClassLoader scriptLoader = new URLClassLoader(new URL[]{scriptFile.toURI().toURL()}, this.getClass().getClassLoader());
+                Class classToLoad = Class.forName(main, true, scriptLoader);
+                Method method = classToLoad.getDeclaredMethod("onLoad");
+                Object[] args = {new Webpage[]{webpage}};
+                method.invoke(null, args);
+              }
+              out.write("200 OK\n");
+              out.write(webpage.getHypertext());
+              c.close();
+              return 200;
+            }
+          }
+        }
+      }
+    }
+  }
