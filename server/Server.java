@@ -55,7 +55,7 @@ public class Server {
             json = json + lineA;
           }
           Json jsonReader = new Json();
-          String[] ips = jsonReader.parseJson(json, String[].class);
+          String[] ips = jsonReader.fromJson(json, String[].class);
           String ip = c.getInetAddress().toString();
           for (int x = ips.length; x > 0; x--) {
             if (ips[x].equals(ip)) {
@@ -69,5 +69,16 @@ public class Server {
           ZipInputStream zip = new ZipInputStream(new FileInputStream(requestedFile));
           ZipEntry entry = zip.getNextEntry();
           while (zip.getNextEntry() != null) {
-            if (entry.getName().equals("info.pf")) {
-              
+            if (entry.getName().equals("info.json")) {
+              BufferedReader infoReader = new BufferedReader(pfar.getInputStream(entry));
+              String infoLine;
+              String fullInfo = "";
+              while ((infoLine = infoReader.readLine()) != null) {
+                fullInfo = fullInfo + infoLine;
+              }
+              JsonObject objInfo = jsonReader.fromJson(fullInfo, JsonObject.class);
+              String scriptName = jsonObject.get("script");
+              if (scriptName != null) {
+                String main = jsonObject.get("main");
+                JarFile scriptFile = new JarFile(scripts.getPath() + scriptName);
+                
