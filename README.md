@@ -8,4 +8,12 @@ The portforward database is a database which can be used by your scripts, and al
 
 # PortForward Configurations
 
-All configurations for the PortForward server / api is written in JSON and is located in the database. There is multiple 
+All configurations for the PortForward server / api is written in JSON and is located in the database. There is multiple files for each configuration, and you can add configurations through scripts. Configurations also give the ability to distribute your scripts to the general public. You can also sell your scripts if you wish to, however they must comply with the liscense if they are distributed.
+
+# PortForward API
+
+The API is included with the server jar file. The API is written in Java, for Java. When a script is specified to run according to the configuration in the .pfar file, the server will run that script. The scripts have full control over the server computer. However, what the scripts can do to the client is limited to JavaScript, so if you do want to do anything that could possibly be risky, you don't have to worry about losing your users, because it is your server.
+
+# PortForward JavaScript API
+
+PortForward includes a JavaScript API for clients. 
