@@ -16,4 +16,4 @@ The API is included with the server jar file. The API is written in Java, for Ja
 
 # PortForward JavaScript API
 
-PortForward includes a JavaScript API for clients. 
+PortForward includes a JavaScript API for clients. The API is mainly used for the server to communicate with clients and includes the ability to run JavaScript functions from a server-side script. It mainly uses AJAX to communicate with the server. There is also many other useful functions included with the API.
