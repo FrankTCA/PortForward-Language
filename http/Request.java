@@ -9,10 +9,12 @@ public class Request {
   int methodId;
   String fileName;
   File fileInRequest;
-  public Request(int method, String file) {
+  String parameters;
+  public Request(int method, String file, String params) {
     methodId = method;
     fileName = file;
     fileInRequest = new File(Settings.getSetting("FILE.ROOT.STRING") + file);
+    parameters = params;
   }
   
   public static Request getRequestFromUserCache(int id) {
@@ -42,5 +44,33 @@ public class Request {
     String[] files = parsedJson.get("files");
     String file = files[id];
     return new Request(methodId1, file);
+  }
+  
+  public int sendRequestToServer(String inetAddress, int port) {
+    Socket c = new Socket(inetAddress, port);
+    PrintWriter out = new PrintWriter(c.getOutputStream, true);
+    BufferedReader in = new BufferedReader(new InputStreamReader(c.getInputStream));
+    switch (methodId) {
+      case 0:
+        out.write("GET " + fileName + "?" + parameters + " HTTP/1.1");
+        out.write("Host: " + inetAddress);
+        break;
+      case 1:
+        out.write("POST " + fileName + " HTTP/1.1");
+        out.write(parameters);
+        out.write("Host: " + inetAddress);
+        break;
+      case 2:
+        out.write("HEAD " + fileName + "?" + parameters + " HTTP/1.1");
+        out.write("Host: " + inetAddress);
+        break;
+      case 4:
+        out.write("DELETE " + fileName + " HTTP/1.1");
+        out.write("Host: " + inetAddress);
+        break;
+      default:
+        System.out.println("Sorry, you cannot run PUT requests, or you the id limit is 4.");
+    }
+    
   }
 }
