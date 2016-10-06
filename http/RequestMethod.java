@@ -1,7 +1,22 @@
 package http;
 
 public class RequestMethod {
-  public Request getMethod(String address) {
+  
+  int methodId;
+  String methodName;
+  
+  public RequestMethod(String name) {
+    methodName = name;
+    if (name.equals("GET")) {
+      methodId = 0;
+    } else if (name.equals("POST")) {
+      methodId = 1;
+    } else {
+      throw new NoSuchRequestException;
+    }
+  }
+  
+  public static RequestMethod getMethod(String address) {
     Gson json = new Gson();
     String databasePath = ServerSession.getDatabase();
     File usercache = new File(databasePath + "/usercache.json");
@@ -19,7 +34,7 @@ public class RequestMethod {
       if (addresses[x].equals(address)) {
         methods = fromJson.get("methods");
         method = methods[x];
-        Method returnStatement = new Method(method);
+        RequestMethod returnStatement = new RequestMethod(method);
         return returnStatement;
       }
     }
